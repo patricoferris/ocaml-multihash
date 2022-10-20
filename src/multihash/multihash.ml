@@ -27,6 +27,13 @@ module Make (H : Hasher) = struct
         { ident; length; digest })
       (H.digest ident v)
 
+  let iter ident v =
+    Result.map
+      (fun digest ->
+        let length = Cstruct.length digest in
+        { ident; length; digest })
+      (H.iter ident v)
+
   let of_string ident v = of_cstruct ident (Cstruct.of_string v)
   let get_hash { ident; _ } = ident
   let get_length { length; _ } = length

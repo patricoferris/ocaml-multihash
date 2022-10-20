@@ -37,6 +37,12 @@ module Make : functor (H : Hasher) -> sig
     (t, [ `Unsupported | `Msg of string ]) result
   (** Same as {!of_cstruct} only using [string]. *)
 
+  val iter :
+    Multicodec.multihash ->
+    ((Cstruct.t -> unit) -> unit) ->
+    (t, [ `Unsupported | `Msg of string ]) result
+  (** Like {!of_cstruct} but we digest the value using the iterator function. *)
+
   val is_supported : Multicodec.multihash -> bool
   (** Whether this particular multihash library supported a given hash implementation. *)
 
