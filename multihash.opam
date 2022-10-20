@@ -33,5 +33,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/patricoferris/ocaml-multihash.git"
 pin-depends:[
-  [ "multicodec" "git+https://github.com/patricoferris/ocaml-multicodec#cba0694076db6277833b26000f1ffa068a2cb4ce" ]
+  [ "multicodec.dev" "git+https://github.com/patricoferris/ocaml-multicodec#cba0694076db6277833b26000f1ffa068a2cb4ce" ]
 ]
