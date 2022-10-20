@@ -63,7 +63,8 @@ let tests =
   let encoding =
     List.map
       (fun (ident, hex) ->
-        ( Fmt.str "encoding_decoding_%s" (Multicodec.multihash_to_string ident),
+        ( Format.asprintf "encoding_decoding_%s"
+            (Multicodec.multihash_to_string ident),
           `Quick,
           test_encode_and_decode (ident, hex) ))
       tests

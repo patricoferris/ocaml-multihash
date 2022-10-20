@@ -46,12 +46,12 @@ let test_decode cstruct expect () =
 let tests =
   let encoding =
     List.map
-      (fun (i, c) -> (Fmt.str "encode_%i" i, `Quick, test_encode i c))
+      (fun (i, c) -> (Format.asprintf "encode_%i" i, `Quick, test_encode i c))
       encodings
   in
   let decoding =
     List.map
-      (fun (i, c) -> (Fmt.str "decode_%i" i, `Quick, test_decode c i))
+      (fun (i, c) -> (Format.asprintf "decode_%i" i, `Quick, test_decode c i))
       encodings
   in
   encoding @ decoding
