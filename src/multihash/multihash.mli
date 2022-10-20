@@ -8,6 +8,11 @@ module type Hasher = sig
     (Cstruct.t, [ `Unsupported | `Msg of string ]) result
   (** [digest ident v] should digest [v] using the hash function related to [ident] *)
 
+  val iter :
+    Multicodec.multihash ->
+    ((Cstruct.t -> unit) -> unit) ->
+    (Cstruct.t, [ `Unsupported | `Msg of string ]) result
+
   val is_supported : Multicodec.multihash -> bool
   (** A subset of {! Multicodec.multihash} that this hasher supports *)
 end
@@ -15,6 +20,10 @@ end
 module Make : functor (H : Hasher) -> sig
   type t
   (** The type for multihashes *)
+
+  val v : Multicodec.multihash -> int -> Cstruct.t -> t
+  (** [v hash length digest] constructs a new multihash. No checks are made at all 
+      on the user-supplied information. *)
 
   val of_cstruct :
     Multicodec.multihash ->

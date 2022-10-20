@@ -28,6 +28,10 @@ module type Hasher =
     val digest :
       Multicodec.multihash ->
       Cstruct.t -> (Cstruct.t, [ `Msg of string | `Unsupported ]) result
+    val iter :
+      Multicodec.multihash ->
+      ((Cstruct.t -> unit) -> unit) ->
+      (Cstruct.t, [ `Msg of string | `Unsupported ]) result
     val is_supported : Multicodec.multihash -> bool
   end
 ```

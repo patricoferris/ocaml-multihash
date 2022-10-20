@@ -6,6 +6,11 @@ module type Hasher = sig
     Cstruct.t ->
     (Cstruct.t, [ `Unsupported | `Msg of string ]) result
 
+  val iter :
+    Multicodec.multihash ->
+    ((Cstruct.t -> unit) -> unit) ->
+    (Cstruct.t, [ `Unsupported | `Msg of string ]) result
+
   val is_supported : Multicodec.multihash -> bool
 end
 
@@ -13,6 +18,7 @@ module Make (H : Hasher) = struct
   type t = { ident : Multicodec.multihash; length : int; digest : Cstruct.t }
 
   let is_supported = H.is_supported
+  let v ident length digest = { ident; length; digest }
 
   let of_cstruct ident v =
     Result.map
