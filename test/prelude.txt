@@ -1,0 +1,4 @@
+#require "digestif.ocaml";;
+#require "multihash-digestif";;
+
+let hexdump v = Format.(fprintf std_formatter "%a%!" Cstruct.hexdump_pp v)

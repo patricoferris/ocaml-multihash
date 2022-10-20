@@ -1,0 +1,4 @@
+(library
+ (name multihash)
+ (public_name multihash)
+ (libraries cstruct multicodec))
