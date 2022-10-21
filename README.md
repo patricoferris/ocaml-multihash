@@ -28,10 +28,17 @@ module type Hasher =
     val digest :
       Multicodec.multihash ->
       Cstruct.t -> (Cstruct.t, [ `Msg of string | `Unsupported ]) result
+    val digest_string :
+      Multicodec.multihash ->
+      string -> (string, [ `Msg of string | `Unsupported ]) result
     val iter :
       Multicodec.multihash ->
       ((Cstruct.t -> unit) -> unit) ->
       (Cstruct.t, [ `Msg of string | `Unsupported ]) result
+    val iter_string :
+      Multicodec.multihash ->
+      ((string -> unit) -> unit) ->
+      (string, [ `Msg of string | `Unsupported ]) result
     val is_supported : Multicodec.multihash -> bool
   end
 ```
@@ -51,13 +58,15 @@ It might be nice to alias the library as we've done here to `Md`. Creating a new
 
 ```ocaml
 # let v = Md.of_string `Sha2_256 s |> Result.get_ok;;
-val v : Md.t = <abstr>
+val v : string Md.t = <abstr>
 ```
 
-Having now digested the data, it can be converted to the full sequence of bytes. We `write` the bytes out as a `Cstruct.t`.
+Note that a multihash is also "tagged" with the internal representation of the digest. We expose two main representations, `string` and `Cstruct.t`. This is mainly to help with avoiding copying bytes when using this library with other libraries. So `Md.of_string` keeps the digest in the `string` representation. Note that there are copying conversion functions in `Md.Conv`.
+
+Having now digested the data, it can be converted to the full sequence of bytes. We `write` the bytes out as the internal representation. Unfortunately the bytes aren't necessarily UTF-8 and that breaks MDX for some reason, so we'll convert them to Cstructs.
 
 ```ocaml
-# let data = Md.write v ;;
+# let data = Md.write v |> Cstruct.of_string;;
 val data : Cstruct.t = {Cstruct.buffer = <abstr>; off = 0; len = 34}
 # let () = hexdump data;;
 12 20 41 dd 7b 64 43 54  2e 75 70 1a a9 8a 0c 23
@@ -68,8 +77,8 @@ val data : Cstruct.t = {Cstruct.buffer = <abstr>; off = 0; len = 34}
 And of course the hash function used and the length are recoverable from the data by reading it back in.
 
 ```ocaml
-# let v = Md.read data |> Result.get_ok;;
-val v : Md.t = <abstr>
+# let v = Md.read_buff data |> Result.get_ok;;
+val v : Cstruct.t Md.t = <abstr>
 # let (ident, length, digest) = 
   let ident = Multicodec.multihash_to_string (Md.get_hash v) in
   (ident, Md.get_length v, Md.get_digest v);;

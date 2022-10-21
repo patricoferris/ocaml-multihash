@@ -3,6 +3,10 @@ module M = Multihash_digestif
 let multihash = Alcotest.testable M.pp M.equal
 let msg ppf = function `Msg s -> Fmt.pf ppf "Error: %s" s
 
+let pp_support ppf = function
+  | `Msg _ as v -> msg ppf v
+  | `Unsupported -> Fmt.pf ppf "Unsupported"
+
 let err =
   let pp ppf = function
     | `Unsupported -> Fmt.pf ppf "Unsupported"
@@ -39,25 +43,28 @@ let multihash_ident =
       Fmt.pf ppf "%s" (Multicodec.multihash_to_string v))
 
 let test_encode_and_decode (hash, hex) () =
-  (if M.is_supported hash then
-   let hex' = M.of_string hash v |> Result.map M.write in
-   Alcotest.(check (result cstruct err))
-     "same multihash"
-     (Ok (Cstruct.of_hex hex))
-     hex');
-  let buf = Cstruct.of_hex hex in
-  let mh = M.read buf in
-  let ident =
-    (Result.map M.get_hash mh
-      :> (Multicodec.multihash, [ `Msg of string | `Unsupported ]) result)
-  in
-  Alcotest.(check (result multihash_ident err))
-    "same multihash_ident" (Ok hash) ident;
-  if M.is_supported hash then
+  if M.is_supported hash then (
+    let hex' = M.of_string hash v |> Result.map M.write in
+    (* Convert out of hex to compare *)
+    let hex = Cstruct.of_hex hex in
+    let hex' = Result.map Cstruct.of_string hex' in
+    Alcotest.(check (result cstruct err)) "same multihash" (Ok hex) hex';
+    let mh = M.of_cstruct hash hex in
+    let ident =
+      (Result.map M.get_hash mh
+        :> (Multicodec.multihash, [ `Msg of string | `Unsupported ]) result)
+    in
+    Alcotest.(check (result multihash_ident err))
+      "same multihash_ident" (Ok hash) ident;
     let buf' = Result.map M.write mh in
-    let h = Result.bind buf' M.read in
-    Alcotest.(check (result multihash (Alcotest.of_pp msg)))
-      "same decoding" mh h
+    let h =
+      Result.bind buf'
+        (M.read_buff
+          :> Cstruct.t ->
+             (Cstruct.t M.t, [ `Msg of string | `Unsupported ]) result)
+    in
+    Alcotest.(check (result multihash (Alcotest.of_pp pp_support)))
+      "same decoding" mh h)
 
 let tests =
   let encoding =

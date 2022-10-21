@@ -5,3 +5,6 @@ val encode : t -> Cstruct.t
 
 val decode : Cstruct.t -> t * int
 (** Deocode an integer as a varint, also returns length read to decode *)
+
+val decode_string : string -> t * int
+(** Same as {!decode} only for strings. *)

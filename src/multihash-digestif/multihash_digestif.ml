@@ -27,6 +27,11 @@ module Hasher = struct
     H.digesti_bigstring (wrap bs) |> fun t ->
     Digestif.to_raw_string h (lift t) |> Cstruct.of_string |> fun v -> Ok v
 
+  let make_iter_string (type v) (module H : Digestif.S with type t = v)
+      (h : v hash) (lift : v -> v t) bs =
+    H.digesti_string bs |> fun t ->
+    Digestif.to_raw_string h (lift t) |> fun v -> Ok v
+
   let iter ident bs =
     match ident with
     | `Blake2b_64 -> make_iter (module BLAKE2B) blake2b of_blake2b bs
@@ -41,6 +46,23 @@ module Hasher = struct
     | `Md5 -> make_iter (module MD5) md5 of_md5 bs
     | `Ripemd_160 -> make_iter (module RMD160) rmd160 of_rmd160 bs
     | `Keccak_256 -> make_iter (module KECCAK_256) keccak_256 of_keccak_256 bs
+    | _ -> Error `Unsupported
+
+  let iter_string ident bs =
+    match ident with
+    | `Blake2b_64 -> make_iter_string (module BLAKE2B) blake2b of_blake2b bs
+    | `Blake2s_64 -> make_iter_string (module BLAKE2S) blake2s of_blake2s bs
+    | `Sha1 -> make_iter_string (module SHA1) sha1 of_sha1 bs
+    | `Sha2_256 -> make_iter_string (module SHA256) sha256 of_sha256 bs
+    | `Sha2_512 -> make_iter_string (module SHA512) sha512 of_sha512 bs
+    | `Sha3_224 -> make_iter_string (module SHA3_224) sha3_224 of_sha3_224 bs
+    | `Sha3_256 -> make_iter_string (module SHA3_256) sha3_256 of_sha3_256 bs
+    | `Sha3_384 -> make_iter_string (module SHA3_384) sha3_384 of_sha3_384 bs
+    | `Sha3_512 -> make_iter_string (module SHA3_512) sha3_512 of_sha3_512 bs
+    | `Md5 -> make_iter_string (module MD5) md5 of_md5 bs
+    | `Ripemd_160 -> make_iter_string (module RMD160) rmd160 of_rmd160 bs
+    | `Keccak_256 ->
+        make_iter_string (module KECCAK_256) keccak_256 of_keccak_256 bs
     | _ -> Error `Unsupported
 
   let digest (ident : Multicodec.multihash) (v : Cstruct.t) =
@@ -59,6 +81,22 @@ module Hasher = struct
     | `Ripemd_160 -> Ok (digest_cstruct rmd160 (digest_bigstring rmd160) v)
     | `Keccak_256 ->
         Ok (digest_cstruct keccak_256 (digest_bigstring keccak_256) v)
+    | _ -> Error `Unsupported
+
+  let digest_string (ident : Multicodec.multihash) (v : string) =
+    match ident with
+    | `Blake2b_64 -> Ok (to_raw_string blake2b (digest_string blake2b v))
+    | `Blake2s_64 -> Ok (to_raw_string blake2s (digest_string blake2s v))
+    | `Sha1 -> Ok (to_raw_string sha1 (digest_string sha1 v))
+    | `Sha2_256 -> Ok (to_raw_string sha256 (digest_string sha256 v))
+    | `Sha2_512 -> Ok (to_raw_string sha512 (digest_string sha512 v))
+    | `Sha3_224 -> Ok (to_raw_string sha3_224 (digest_string sha3_224 v))
+    | `Sha3_256 -> Ok (to_raw_string sha3_256 (digest_string sha3_256 v))
+    | `Sha3_384 -> Ok (to_raw_string sha3_384 (digest_string sha3_384 v))
+    | `Sha3_512 -> Ok (to_raw_string sha3_512 (digest_string sha3_512 v))
+    | `Md5 -> Ok (to_raw_string md5 (digest_string md5 v))
+    | `Ripemd_160 -> Ok (to_raw_string rmd160 (digest_string rmd160 v))
+    | `Keccak_256 -> Ok (to_raw_string keccak_256 (digest_string keccak_256 v))
     | _ -> Error `Unsupported
 end
 

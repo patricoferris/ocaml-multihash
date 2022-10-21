@@ -39,3 +39,21 @@ let decode buff =
   in
   let r, i = loop 0 in
   (r, i + 1)
+
+let decode_string (buff : string) =
+  let x = ref 0 in
+  let s = ref 0 in
+  let rec loop i =
+    if i >= max_varint_len_64 then (!x, i)
+    else
+      let b = String.get_uint8 buff i in
+      if b < 0x80 then
+        if i == max_varint_len_64 - 1 && b > 1 then (!x, i)
+        else (!x lor (b lsl !s), i)
+      else (
+        x := !x lor ((b land 0x7f) lsl !s);
+        s := !s + 7;
+        loop (i + 1))
+  in
+  let r, i = loop 0 in
+  (r, i + 1)
