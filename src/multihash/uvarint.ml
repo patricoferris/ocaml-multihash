@@ -40,13 +40,15 @@ let decode buff =
   let r, i = loop 0 in
   (r, i + 1)
 
+let unsafe_get_uint8 t off = Char.code (String.unsafe_get t off)
+
 let decode_string (buff : string) =
   let x = ref 0 in
   let s = ref 0 in
   let rec loop i =
     if i >= max_varint_len_64 then (!x, i)
     else
-      let b = String.get_uint8 buff i in
+      let b = unsafe_get_uint8 buff i in
       if b < 0x80 then
         if i == max_varint_len_64 - 1 && b > 1 then (!x, i)
         else (!x lor (b lsl !s), i)
