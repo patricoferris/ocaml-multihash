@@ -13,6 +13,7 @@ depends: [
   "alcotest" {with-test}
   "multihash" {= version}
   "digestif"
+  "mdx" {with-test}
   "odoc" {with-doc}
 ]
 build: [

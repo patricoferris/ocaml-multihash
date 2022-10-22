@@ -1,3 +1,4 @@
 (test
  (name test)
+ (package multihash-digestif)
  (libraries multihash-digestif alcotest))
