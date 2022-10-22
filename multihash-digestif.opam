@@ -2,7 +2,7 @@
 opam-version: "2.0"
 synopsis: "Self-describing Hash Functions using Digestif"
 description:
-  "This library provides self-describing hash functions using digestif for implementations"
+  "This library provides self-describing hash functions using digestif"
 maintainer: ["patrick@sirref.org"]
 authors: ["patrick@sirref.org"]
 license: "MIT"

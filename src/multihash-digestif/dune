@@ -2,3 +2,6 @@
  (name multihash_digestif)
  (public_name multihash-digestif)
  (libraries multihash digestif))
+
+(documentation
+ (package multihash-digestif))

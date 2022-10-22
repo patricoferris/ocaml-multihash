@@ -17,7 +17,6 @@ module Hasher = struct
     | `Keccak_256 ]
 
   let is_supported = function #supported -> true | _ -> false
-  let string = Digestif.to_raw_string
 
   let wrap (f : Cstruct.t iter) : bigstring iter =
    fun bs -> f (fun x -> bs (Cstruct.to_bigarray x))

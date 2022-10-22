@@ -1,28 +1,5 @@
 module Uvarint = Uvarint
-
-module type Hasher = sig
-  val digest :
-    Multicodec.multihash ->
-    Cstruct.t ->
-    (Cstruct.t, [ `Unsupported | `Msg of string ]) result
-
-  val digest_string :
-    Multicodec.multihash ->
-    string ->
-    (string, [ `Unsupported | `Msg of string ]) result
-
-  val iter :
-    Multicodec.multihash ->
-    ((Cstruct.t -> unit) -> unit) ->
-    (Cstruct.t, [ `Unsupported | `Msg of string ]) result
-
-  val iter_string :
-    Multicodec.multihash ->
-    ((string -> unit) -> unit) ->
-    (string, [ `Unsupported | `Msg of string ]) result
-
-  val is_supported : Multicodec.multihash -> bool
-end
+include Multihash_intf
 
 type _ repr = C : Cstruct.t repr | S : string repr
 

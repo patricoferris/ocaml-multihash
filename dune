@@ -3,5 +3,3 @@
  (package multihash-digestif)
  (packages multihash-digestif)
  (preludes test/prelude.txt))
-
-(vendored_dirs digestif)
